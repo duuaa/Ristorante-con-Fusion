@@ -2,7 +2,7 @@ import React,{Component} from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Label, Col, Row, Modal, ModalHeader,ModalBody,Input,Form,FormGroup } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
-
+import { Loading } from './LoadingComponent';
 
 
 
@@ -23,8 +23,11 @@ class CommentForm extends Component{
       });
   }
   handleSubmit(values){
-      console.log("Current State is "+ JSON.stringify(values));
-      alert("Current State is "+ JSON.stringify(values));
+     // console.log("Current State is "+ JSON.stringify(values));
+      this.toggleModal();
+      this.props.addComment(this.props.dishId,values.rating, values.author,values.comment);
+    //   console.log("Current State is "+ JSON.stringify(values));
+     //alert("Current State is "+ JSON.stringify(values));
       //this prevents from going to another page
       //event.preventDefault();
   }
@@ -91,7 +94,8 @@ class CommentForm extends Component{
 }
 
 
-function RenderComments({ comments }) {
+
+function RenderComments({ comments ,addComment ,dishId}) {
 
     const com = comments.map((commente) => {
         return (
@@ -116,7 +120,7 @@ function RenderComments({ comments }) {
                 <h4> Comment </h4> {com}
             </div>
             <div>
-             <CommentForm/>
+             <CommentForm dishId={dishId} addComment={addComment}/>
              </div></div>
     );
 }
@@ -137,7 +141,25 @@ function RenderDish({ dish }) {
 }
 
 const Details = (props) => {
-    if (props.dish != null) {
+    if(props.isLoading){
+        return (
+            <div className ="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+
+    }else if(props.errMess){
+        return (
+            <div className ="container">
+                <div className="row">
+                     <h4>{props.errMess}</h4>
+                </div>
+            </div>
+        );
+    }
+    else if (props.dish != null) {
         return (
             <div className="container">
                 <div className="row">
@@ -156,7 +178,9 @@ const Details = (props) => {
                         <RenderDish dish={props.dish} />
                     </div>
                     <div className="col-12 col-md-5 m-1">
-                        <RenderComments comments={props.comments} />
+                        <RenderComments comments={props.comments}
+                        addComment={props.addComment}
+                        dishId={props.dish.id} />
 
                     </div>
                 </div>
@@ -171,3 +195,6 @@ const Details = (props) => {
 }
 
 export default Details;
+
+
+
